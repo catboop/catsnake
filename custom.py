@@ -15,8 +15,8 @@ SPEED = 75
 class Snake(object):
     def __init__(self):
         # loading snake images
-        self.head = pygame.image.load("head.png").convert_alpha() 
-        self.head = pygame.transform.scale(self.head, (35, 35))
+        self.head = pygame.image.load("kitcat.png").convert_alpha() 
+        self.head = pygame.transform.scale(self.head, (50, 50))
         self.body_part_1 = pygame.image.load("body.png").convert_alpha()
         self.body_part_1 = pygame.transform.scale(self.body_part_1, (25, 25))
        
@@ -24,14 +24,13 @@ class Snake(object):
         self.x_position = [0]
         self.y_position = [0]
         
-        self.length = 2
+        self.length = 1
         self.increase_size()        
         
         self.score = 0
         
     def get_head_position(self):
-        # position of head of snake, first square in 
-        # positions property
+        # position of head of snake
         return (self.x_position[0], self.y_position[0])
 
     # increasing size of list to potentially have 1000 sections for snake
@@ -41,7 +40,7 @@ class Snake(object):
             self.x_position.append(-100)
             self.y_position.append(-100)
  
-    @staticmethod
+    @staticmethod # part of class def but not part of objects it creates
     def collision(x_1, y_1, x_2, y_2, size_snake, size_fruit):
         if ((x_1 + size_snake >= x_2) or (x_1 >= x_2)) and x_1 <= x_2 + size_fruit:
             if ((y_1 >= y_2) or (y_1 + size_snake >= y_2)) and y_1 <= y_2 + size_fruit:
@@ -125,8 +124,8 @@ class Snake(object):
 class Food(object):
     def __init__(self):
         # loading food image
-        self.fruit = pygame.image.load("fruit.png").convert_alpha()
-        self.fruit = pygame.transform.scale(self.fruit, (35,35))
+        self.fruit = pygame.image.load("wine.png").convert_alpha()
+        self.fruit = pygame.transform.scale(self.fruit, (90,90))
         self.position_fruit = (0, 0)
         self.randomize_position()
     
@@ -135,7 +134,6 @@ class Food(object):
         self.position_fruit = self.fruit.get_rect()
         self.position_fruit.x = random.randint(1,20) * STEP
         self.position_fruit.y = random.randint(1,20) * STEP
-
 
 def main(): 
     global PLAYING
@@ -161,7 +159,6 @@ def main():
     food = Food()
 
     # blit head and first part of body
-    window.blit(snake.body_part_1, (-5, 5))
     window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
     # blit fruit
@@ -202,13 +199,13 @@ def main():
         if snake.x_position[0] < window_rect.left:
             PLAYING = False
 
-        if snake.x_position[0] + 35 > window_rect.right:
+        if snake.x_position[0] + 50 > window_rect.right:
             PLAYING = False
 
         if snake.y_position[0] < window_rect.top:
             PLAYING = False
         
-        if snake.y_position[0] + 35 > window_rect.bottom:
+        if snake.y_position[0] + 50 > window_rect.bottom:
             PLAYING = False
                 
         # calling the collision function to check if the snake hits itself
@@ -217,24 +214,24 @@ def main():
                 PLAYING = False
         
         # calling the collision function to check if the snake hits the fruit
-        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_fruit.x, food.position_fruit.y,35,25):
-        
+        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_fruit.x, food.position_fruit.y,50,25):
+    
             # Giving new coordinates to the fruit when the snake eats it
             food.randomize_position()  
     
             # Giving new coordinates to the fruit if the ones given above are the same as the snake's ones
             for j in range(0, snake.length):
-                while snake.collision(food.position_fruit.x, food.position_fruit.y, snake.x_position[j], snake.y_position[j], 35, 25):
+                while snake.collision(food.position_fruit.x, food.position_fruit.y, snake.x_position[j], snake.y_position[j], 50, 25):
                     food.randomize_position()  
             
             # Increasing the size of the snake and the score
             snake.length += 1
             snake.score += 1
-        
+                
         #blit parts of snake on screen using updated coordinates
         for i in range(1, snake.length):
             window.blit(snake.body_part_1, (snake.x_position[i], snake.y_position[i]))
-
+        
         # blit score
         font = pygame.font.SysFont(None, 25)
         text = font.render("Score: {0}".format(snake.score), 1, (0, 0, 0))
@@ -248,5 +245,25 @@ def main():
 
         # Delaying the game to make the snake move fluidly
         time.sleep (SPEED / 1000)
+
+    # when loop is over (i.e. no longer playing), create gameover screen
+    # create black screen
+    cover = pygame.Surface(window.get_size())
+    cover = cover.convert()
+    cover.fill((0, 0, 0))
+    window.blit(cover, (0,0))
+
+    # add gameover text + score
+    font = pygame.font.SysFont(None, 60)
+    text = font.render('GO TO SLEEP!', True, (250,250,250))
+    text_score = font.render("Score: {0}".format(snake.score), 1, (250, 250, 250))
+    window.blit(text, (100, 200))
+    window.blit(text_score, (100, 250))
+    
+    # update display
+    pygame.display.flip()
+
+    #suspend execution for given num of secs
+    time.sleep(3) 
 
 main()

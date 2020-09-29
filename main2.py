@@ -53,7 +53,7 @@ cover.fill((152, 251, 152)) #fill entire board game with chosen color
 window.blit(cover, (0, 0)) # blit allows you to stick something on board game
 
 # refreshing screen to display everything
-pygame.display.flip() # flip refreshes screen, must use every time you "blit" something
+≈ # flip refreshes screen, must use every time you "blit" something
 
 # loading main images on game window
 head = pygame.image.load("head.png").convert_alpha() 
