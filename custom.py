@@ -133,8 +133,8 @@ class Food(object):
     def randomize_position(self):
         # give random coordinates
         self.position_fruit = self.fruit.get_rect()
-        self.position_fruit.x = random.randint(2,10)*STEP
-        self.position_fruit.y = random.randint(2,10)*STEP
+        self.position_fruit.x = random.randint(1,20) * STEP
+        self.position_fruit.y = random.randint(1,20) * STEP
 
 
 def main(): 
@@ -175,12 +175,6 @@ def main():
         snake.handle_keys() #invoke keystroke handler
         snake.move() # move snake
 
-        # if snake collides with food
-        if snake.get_head_position() == food.position_fruit:
-            snake.length += 1
-            snake.score += 1
-            food.randomize_position()
-
         # move each body part of body by giving them new coordinates
         # each part of the snake will take positions of the part before it
         # give updated coordinates to entire snake by doing this on entire list
@@ -191,23 +185,18 @@ def main():
         # moving snake in certain direction if user presses key
         if MOVE_UP:
             snake.y_position[0] -= STEP 
-            window.blit(bg, (0,0)) 
-            window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
         if MOVE_DOWN:
             snake.y_position[0] += STEP
-            window.blit(bg, (0,0))
-            window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
         if MOVE_RIGHT:
             snake.x_position[0] += STEP
-            window.blit(bg, (0,0))
-            window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
         if MOVE_LEFT:
             snake.x_position[0] -= STEP
-            window.blit(bg, (0,0))
-            window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
+
+        window.blit(bg, (0,0))
+        window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
         # calling the collision function to check if the snake hits the edges of the window
         if snake.x_position[0] < window_rect.left:
@@ -223,13 +212,29 @@ def main():
             PLAYING = False
                 
         # calling the collision function to check if the snake hits itself
-        if snake.collision(snake.x_position[0], snake.y_position[0], snake.x_position[i], snake.y_position[i], 0, 0) and (MOVE_INIT == True):
-            PLAYING = False
-
+        for i in range(snake.length - 1, 0, -1):
+            if snake.collision(snake.x_position[0], snake.y_position[0], snake.x_position[i], snake.y_position[i], 0, 0) and (MOVE_INIT == True):
+                PLAYING = False
+        
+        # calling the collision function to check if the snake hits the fruit
+        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_fruit.x, food.position_fruit.y,35,25):
+        
+            # Giving new coordinates to the fruit when the snake eats it
+            food.randomize_position()  
+    
+            # Giving new coordinates to the fruit if the ones given above are the same as the snake's ones
+            for j in range(0, snake.length):
+                while snake.collision(food.position_fruit.x, food.position_fruit.y, snake.x_position[j], snake.y_position[j], 35, 25):
+                    food.randomize_position()  
+            
+            # Increasing the size of the snake and the score
+            snake.length += 1
+            snake.score += 1
+        
         #blit parts of snake on screen using updated coordinates
         for i in range(1, snake.length):
             window.blit(snake.body_part_1, (snake.x_position[i], snake.y_position[i]))
-        
+
         # blit score
         font = pygame.font.SysFont(None, 25)
         text = font.render("Score: {0}".format(snake.score), 1, (0, 0, 0))
