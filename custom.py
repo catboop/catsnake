@@ -160,9 +160,6 @@ def main():
     window.blit(snake.body_part_1, (-5, 5))
     window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
-    # blit fruit
-    window.blit(food.fruit, food.position_fruit)
-
     # update contents of entire display
     pygame.display.flip()
 
@@ -177,11 +174,6 @@ def main():
             snake.score += 1
             food.randomize_position()
 
-        # blit score
-        font = pygame.font.SysFont(None, 25)
-        text = font.render("Score: {0}".format(snake.score), 1, (0, 0, 0))
-        window.blit(text, (400, 10))
-
         # move each body part of body by giving them new coordinates
         # each part of the snake will take positions of the part before it
         # give updated coordinates to entire snake by doing this on entire list
@@ -189,10 +181,6 @@ def main():
             snake.x_position[i] = snake.x_position[(i-1)]
             snake.y_position[i] = snake.y_position[(i-1)]
 
-        #blit parts of snake on screen using updated coordinates
-        for i in range(1, snake.length):
-            window.blit(snake.body_part_1, (snake.x_position[i], snake.y_position[i]))
-        
         # moving snake in certain direction if user presses key
         if MOVE_UP:
             snake.y_position[0] -= STEP 
@@ -213,6 +201,18 @@ def main():
             snake.x_position[0] -= STEP
             window.blit(bg, (0,0))
             window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
+
+        #blit parts of snake on screen using updated coordinates
+        for i in range(1, snake.length):
+            window.blit(snake.body_part_1, (snake.x_position[i], snake.y_position[i]))
+        
+        # blit score
+        font = pygame.font.SysFont(None, 25)
+        text = font.render("Score: {0}".format(snake.score), 1, (0, 0, 0))
+        window.blit(text, (400, 10))
+
+        # blit fruit
+        window.blit(food.fruit, food.position_fruit)
 
         # Flipping to add everything on the board
         pygame.display.flip()
