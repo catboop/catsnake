@@ -41,9 +41,10 @@ class Snake(object):
             self.x_position.append(-100)
             self.y_position.append(-100)
  
+    @staticmethod
     def collision(x_1, y_1, x_2, y_2, size_snake, size_fruit):
-        if ((x_1 + size_snake >= x_2) or (x_1 >= x_2) and x_1 <= x_2 + size_fruit):
-            if ((y_1 >= y_2) or (y_1 + size_snake >= y_2) and y_1 <= y_2 + size_fruit):
+        if ((x_1 + size_snake >= x_2) or (x_1 >= x_2)) and x_1 <= x_2 + size_fruit:
+            if ((y_1 >= y_2) or (y_1 + size_snake >= y_2)) and y_1 <= y_2 + size_fruit:
                 return True
             return False
 
@@ -137,11 +138,14 @@ class Food(object):
 
 
 def main(): 
+    global PLAYING
+
     # initialize game => will initialize display module
     pygame.init()
 
     # create single display Surface
     window = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    window_rect = window.get_rect()
 
     # load background image
     bg = pygame.image.load("background.jpg")
@@ -159,6 +163,9 @@ def main():
     # blit head and first part of body
     window.blit(snake.body_part_1, (-5, 5))
     window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
+
+    # blit fruit
+    window.blit(food.fruit, food.position_fruit)
 
     # update contents of entire display
     pygame.display.flip()
@@ -201,6 +208,23 @@ def main():
             snake.x_position[0] -= STEP
             window.blit(bg, (0,0))
             window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
+
+        # calling the collision function to check if the snake hits the edges of the window
+        if snake.x_position[0] < window_rect.left:
+            PLAYING = False
+
+        if snake.x_position[0] + 35 > window_rect.right:
+            PLAYING = False
+
+        if snake.y_position[0] < window_rect.top:
+            PLAYING = False
+        
+        if snake.y_position[0] + 35 > window_rect.bottom:
+            PLAYING = False
+                
+        # calling the collision function to check if the snake hits itself
+        if snake.collision(snake.x_position[0], snake.y_position[0], snake.x_position[i], snake.y_position[i], 0, 0) and (MOVE_INIT == True):
+            PLAYING = False
 
         #blit parts of snake on screen using updated coordinates
         for i in range(1, snake.length):
