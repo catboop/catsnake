@@ -229,7 +229,7 @@ while (playing == True):
     # Flipping to add everything on the board
     pygame.display.flip()
 
-    # Delaying the game to make the snake move fluently
+    # Delaying the game to make the snake move fluidly
     time.sleep (speed / 1000)
 
     
