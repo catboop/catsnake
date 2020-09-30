@@ -23,18 +23,11 @@ class Snake(object):
         # each item of lists will store coordinates of one body part of snake
         self.x_position = [0]
         self.y_position = [0]
+        self.increase_size() # create placeholders  
         
         self.length = 1
-        self.increase_size()        
         
         self.score = 0
-        
-    def get_head_position(self):
-        # position of head of snake
-        position_1 = self.head.get_rect()
-        self.x_position[0] = position_1.x
-        self.y_position[0] = position_1.y
-        return (self.x_position[0], self.y_position[0])
 
     # increasing size of list to potentially have 1000 sections for snake
     # when snake gets bigger, list will have 1,000 items already created to store new body part's coordinates
@@ -69,7 +62,7 @@ class Snake(object):
 
             #checking if user quits game
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                PLAYING = False
+               pygame.quit()
 
             #checking if user presses key
             if event.type == pygame.KEYDOWN:
@@ -93,7 +86,6 @@ class Snake(object):
                             MOVE_DOWN == False
                             
                         else:
-                            
                             MOVE_RIGHT = MOVE_LEFT = MOVE_UP = False 
                             MOVE_DOWN = MOVE_INIT = True
 
@@ -119,7 +111,7 @@ class Snake(object):
 
 class Food(object):
     def __init__(self):
-        # loading food image
+        # loading initial food image
         self.food = pygame.image.load("wine.png").convert_alpha()
         self.food = pygame.transform.scale(self.food, (50,50))
         self.position_food = (0, 0)
@@ -132,24 +124,28 @@ class Food(object):
             pygame.image.load("taco.png").convert_alpha(),
             pygame.image.load("pizza.png").convert_alpha()
         ]
+        # randomly select from images list
         self.food = images[random.randint(0,len(images) - 1)]
         self.food = pygame.transform.scale(self.food, (50,50))
 
 
     def randomize_position(self):
-        # give random coordinates
+        # give random coordinates for food position
         self.position_food = self.food.get_rect()
         self.position_food.x = random.randint(1,20) * STEP
         self.position_food.y = random.randint(1,20) * STEP
 
 def main(): 
     global PLAYING
+    # initialize sound mixer
     pygame.mixer.init()
+    # load sound files
     noms = pygame.mixer.Sound("nom.wav")
     death = pygame.mixer.Sound("death2.wav")
     music = pygame.mixer.Sound("80s.wav")
     noms.set_volume(0.8)
     music.set_volume(0.3)
+    # play main tune
     music.play(-1) # -1 will repeat music indefinitely
 
     # initialize game => will initialize display module
@@ -183,10 +179,10 @@ def main():
 
     # create continuous loop to keep screen visible
     while (PLAYING == True):
-        snake.handle_keys() #invoke keystroke handler
-        snake.move() # move snake
+        snake.handle_keys() #invoke handle_keys method => updates boolean values for global MOVE variables
+        snake.move() # invoke move method => updates position coordinates
 
-        # moving snake in certain direction if user presses key
+        # moving snake in certain direction if user presses key by updating coordinates of head
         if MOVE_UP:
             snake.y_position[0] -= STEP 
 
@@ -199,14 +195,15 @@ def main():
         if MOVE_LEFT:
             snake.x_position[0] -= STEP
             
+        # re-blit bg and head
         window.blit(bg, (0,0))
         window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
-        #blit parts of snake on screen using updated coordinates
+        #blit body parts of snake on screen using updated coordinates
         for i in range(1, snake.length):
             window.blit(snake.body_part, (snake.x_position[i], snake.y_position[i]))
 
-        # calling the collision function to check if the snake hits the edges of the window
+        # check if the snake hits the edges of the window
         if snake.x_position[0] < window_rect.left:
             PLAYING = False
 
@@ -219,13 +216,13 @@ def main():
         if snake.y_position[0] + 50 > window_rect.bottom:
             PLAYING = False
         
-        # calling the collision function to check if the snake hits itself
+        # calling the collision function to check if the snake hits itself (head position = body part position?)
         for i in range(snake.length - 1, 0, -1):
             if snake.collision(snake.x_position[0], snake.y_position[0], snake.x_position[i], snake.y_position[i], 0, 0) and (MOVE_INIT == True):
                 PLAYING = False
         
         # calling the collision function to check if the snake hits the food
-        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_food.x, food.position_food.y,50,25):
+        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_food.x, food.position_food.y, 50, 50):
     
             # Giving new coordinates to the food when the snake eats it
             food.randomize_position()  
@@ -235,16 +232,16 @@ def main():
     
             # Giving new coordinates to the food if the ones given above are the same as the snake's ones
             for j in range(0, snake.length):
-                while snake.collision(food.position_food.x, food.position_food.y, snake.x_position[j], snake.y_position[j], 50, 25):
+                while snake.collision(food.position_food.x, food.position_food.y, snake.x_position[j], snake.y_position[j], 50, 50):
                     food.randomize_position()  
             
             # Increasing the size of the snake and the score
             noms.play()
             snake.length += 1
             snake.score += 1
-        
+
         # blit score
-        font = pygame.font.SysFont('Arial', 25)
+        font = pygame.font.SysFont("Arial", 25)
         text = font.render("Score: {0}".format(snake.score), 1, (250, 250, 250))
         window.blit(text, (400, 10))
   
@@ -278,5 +275,6 @@ def main():
 
     #suspend execution for given num of secs
     time.sleep(3) 
+    pygame.quit()
 
 main()
