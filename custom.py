@@ -147,7 +147,10 @@ def main():
     pygame.mixer.init()
     noms = pygame.mixer.Sound("nom.wav")
     death = pygame.mixer.Sound("death2.wav")
-
+    music = pygame.mixer.Sound("80s.wav")
+    noms.set_volume(0.8)
+    music.set_volume(0.3)
+    music.play(-1) # -1 will repeat indefinitely
 
     # initialize game => will initialize display module
     pygame.init()
@@ -256,6 +259,7 @@ def main():
 
     # when loop is over (i.e. no longer playing), create gameover screen
     # create black screen
+    music.stop()
     death.play()
     cover = pygame.Surface(window.get_size())
     cover = cover.convert()
