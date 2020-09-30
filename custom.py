@@ -17,8 +17,8 @@ class Snake(object):
         # loading snake images
         self.head = pygame.image.load("kitcat.png").convert_alpha() 
         self.head = pygame.transform.scale(self.head, (50, 50))
-        self.body_part_1 = pygame.image.load("body.png").convert_alpha()
-        self.body_part_1 = pygame.transform.scale(self.body_part_1, (25, 25))
+        self.body_part = pygame.image.load("body.png").convert_alpha()
+        self.body_part = pygame.transform.scale(self.body_part, (25, 25))
        
         # each item of lists will store coordinates of one body part of snake
         self.x_position = [0]
@@ -31,6 +31,9 @@ class Snake(object):
         
     def get_head_position(self):
         # position of head of snake
+        position_1 = self.head.get_rect()
+        self.x_position[0] = position_1.x
+        self.y_position[0] = position_1.y
         return (self.x_position[0], self.y_position[0])
 
     # increasing size of list to potentially have 1000 sections for snake
@@ -41,9 +44,9 @@ class Snake(object):
             self.y_position.append(-100)
  
     @staticmethod # part of class def but not part of objects it creates
-    def collision(x_1, y_1, x_2, y_2, size_snake, size_fruit):
-        if ((x_1 + size_snake >= x_2) or (x_1 >= x_2)) and x_1 <= x_2 + size_fruit:
-            if ((y_1 >= y_2) or (y_1 + size_snake >= y_2)) and y_1 <= y_2 + size_fruit:
+    def collision(x_1, y_1, x_2, y_2, size_snake, size_food):
+        if ((x_1 + size_snake >= x_2) or (x_1 >= x_2)) and x_1 <= x_2 + size_food:
+            if ((y_1 >= y_2) or (y_1 + size_snake >= y_2)) and y_1 <= y_2 + size_food:
                 return True
             return False
 
@@ -51,16 +54,9 @@ class Snake(object):
         # move each body part of body by giving them new coordinates
         # each part of the snake will take positions of the part before it
         # give updated coordinates to entire snake by doing this on entire list
-        for i in range(self.length - 1, 0, -1):
-            self.x_position[i] = self.x_position[(i-1)]
-            self.y_position[i] = self.y_position[(i-1)]
-
-    # # reset length, positions, direction, and score
-    # def reset(self):
-    #     self.length = 1
-    #     self.positions = [((SCREEN_WIDTH / 2), (SCREEN_HEIGHT /2))]
-    #     self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
-    #     self.score = 0
+        for i in range(self.length-1, 0, -1):
+            self.x_position[i] = self.x_position[i - 1]
+            self.y_position[i] = self.y_position[i - 1]
 
     def handle_keys(self):
         global MOVE_RIGHT
@@ -124,16 +120,27 @@ class Snake(object):
 class Food(object):
     def __init__(self):
         # loading food image
-        self.fruit = pygame.image.load("wine.png").convert_alpha()
-        self.fruit = pygame.transform.scale(self.fruit, (90,90))
-        self.position_fruit = (0, 0)
+        self.food = pygame.image.load("wine.png").convert_alpha()
+        self.food = pygame.transform.scale(self.food, (50,50))
+        self.position_food = (0, 0)
         self.randomize_position()
     
+    def randomize_food(self):
+        images = [
+            pygame.image.load("wine.png").convert_alpha(),
+            pygame.image.load("icecream.png").convert_alpha(),
+            pygame.image.load("taco.png").convert_alpha(),
+            pygame.image.load("pizza.png").convert_alpha()
+        ]
+        self.food = images[random.randint(0,len(images) - 1)]
+        self.food = pygame.transform.scale(self.food, (50,50))
+
+
     def randomize_position(self):
         # give random coordinates
-        self.position_fruit = self.fruit.get_rect()
-        self.position_fruit.x = random.randint(1,20) * STEP
-        self.position_fruit.y = random.randint(1,20) * STEP
+        self.position_food = self.food.get_rect()
+        self.position_food.x = random.randint(1,20) * STEP
+        self.position_food.y = random.randint(1,20) * STEP
 
 def main(): 
     global PLAYING
@@ -154,24 +161,26 @@ def main():
     # create window caption
     pygame.display.set_caption("Cat's Snake Game")
 
-    # create Snake and Food instances
+    # create Snake and food instances
     snake = Snake()
     food = Food()
 
-    # blit head and first part of body
+    # blit head
     window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
 
-    # blit fruit
-    window.blit(food.fruit, food.position_fruit)
+    # blit food
+    window.blit(food.food, food.position_food)
 
     # update contents of entire display
     pygame.display.flip()
+
+    snake.get_head_position()
 
     # create continuous loop to keep screen visible
     while (PLAYING == True):
         snake.handle_keys() #invoke keystroke handler
         snake.move() # move snake
-
+        
         # move each body part of body by giving them new coordinates
         # each part of the snake will take positions of the part before it
         # give updated coordinates to entire snake by doing this on entire list
@@ -191,9 +200,13 @@ def main():
 
         if MOVE_LEFT:
             snake.x_position[0] -= STEP
-
+            
         window.blit(bg, (0,0))
         window.blit(snake.head, (snake.x_position[0], snake.y_position[0]))
+
+        #blit parts of snake on screen using updated coordinates
+        for i in range(1, snake.length):
+            window.blit(snake.body_part, (snake.x_position[i], snake.y_position[i]))
 
         # calling the collision function to check if the snake hits the edges of the window
         if snake.x_position[0] < window_rect.left:
@@ -207,38 +220,37 @@ def main():
         
         if snake.y_position[0] + 50 > window_rect.bottom:
             PLAYING = False
-                
+        
         # calling the collision function to check if the snake hits itself
         for i in range(snake.length - 1, 0, -1):
             if snake.collision(snake.x_position[0], snake.y_position[0], snake.x_position[i], snake.y_position[i], 0, 0) and (MOVE_INIT == True):
                 PLAYING = False
         
-        # calling the collision function to check if the snake hits the fruit
-        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_fruit.x, food.position_fruit.y,50,25):
+        # calling the collision function to check if the snake hits the food
+        if snake.collision(snake.x_position[0], snake.y_position[0], food.position_food.x, food.position_food.y,50,25):
     
-            # Giving new coordinates to the fruit when the snake eats it
+            # Giving new coordinates to the food when the snake eats it
             food.randomize_position()  
+
+            # change food
+            food.randomize_food()
     
-            # Giving new coordinates to the fruit if the ones given above are the same as the snake's ones
+            # Giving new coordinates to the food if the ones given above are the same as the snake's ones
             for j in range(0, snake.length):
-                while snake.collision(food.position_fruit.x, food.position_fruit.y, snake.x_position[j], snake.y_position[j], 50, 25):
+                while snake.collision(food.position_food.x, food.position_food.y, snake.x_position[j], snake.y_position[j], 50, 25):
                     food.randomize_position()  
             
             # Increasing the size of the snake and the score
             snake.length += 1
             snake.score += 1
-                
-        #blit parts of snake on screen using updated coordinates
-        for i in range(1, snake.length):
-            window.blit(snake.body_part_1, (snake.x_position[i], snake.y_position[i]))
         
         # blit score
-        font = pygame.font.SysFont(None, 25)
-        text = font.render("Score: {0}".format(snake.score), 1, (0, 0, 0))
+        font = pygame.font.SysFont('Arial', 25)
+        text = font.render("Score: {0}".format(snake.score), 1, (250, 250, 250))
         window.blit(text, (400, 10))
-
-        # blit fruit
-        window.blit(food.fruit, food.position_fruit)
+  
+        # blit food
+        window.blit(food.food, food.position_food)
 
         # Flipping to add everything on the board
         pygame.display.flip()
