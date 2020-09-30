@@ -9,7 +9,7 @@ MOVE_UP = MOVE_DOWN = MOVE_RIGHT = MOVE_LEFT = MOVE_INIT = False
 # other int variables
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
-STEP = 23 # used for random num generation
+STEP = 23 # used for random coordinate calc
 SPEED = 75
 
 class Snake(object):
@@ -174,19 +174,10 @@ def main():
     # update contents of entire display
     pygame.display.flip()
 
-    snake.get_head_position()
-
     # create continuous loop to keep screen visible
     while (PLAYING == True):
         snake.handle_keys() #invoke keystroke handler
         snake.move() # move snake
-        
-        # move each body part of body by giving them new coordinates
-        # each part of the snake will take positions of the part before it
-        # give updated coordinates to entire snake by doing this on entire list
-        for i in range(snake.length - 1, 0, -1):
-            snake.x_position[i] = snake.x_position[(i-1)]
-            snake.y_position[i] = snake.y_position[(i-1)]
 
         # moving snake in certain direction if user presses key
         if MOVE_UP:
