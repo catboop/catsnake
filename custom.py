@@ -54,7 +54,7 @@ class Snake(object):
         # move each body part of body by giving them new coordinates
         # each part of the snake will take positions of the part before it
         # give updated coordinates to entire snake by doing this on entire list
-        for i in range(self.length-1, 0, -1):
+        for i in range(self.length - 1, 0, -1):
             self.x_position[i] = self.x_position[i - 1]
             self.y_position[i] = self.y_position[i - 1]
 
@@ -150,7 +150,7 @@ def main():
     music = pygame.mixer.Sound("80s.wav")
     noms.set_volume(0.8)
     music.set_volume(0.3)
-    music.play(-1) # -1 will repeat indefinitely
+    music.play(-1) # -1 will repeat music indefinitely
 
     # initialize game => will initialize display module
     pygame.init()

@@ -15,7 +15,7 @@ cd snakeygame
 python custom.py
 ```
 
-3) Use the arrow keys to move the snake around. Avoid hitting the walls or your tail. 
+3) Use the arrow keys to move the snake around. Try to eat all the goodies that pop up, while avoiding the walls or your tail. 
 
 ### Version Used
 Python 3.8.5
