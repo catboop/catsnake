@@ -144,6 +144,10 @@ class Food(object):
 
 def main(): 
     global PLAYING
+    pygame.mixer.init()
+    noms = pygame.mixer.Sound("nom.wav")
+    death = pygame.mixer.Sound("death2.wav")
+
 
     # initialize game => will initialize display module
     pygame.init()
@@ -232,6 +236,7 @@ def main():
                     food.randomize_position()  
             
             # Increasing the size of the snake and the score
+            noms.play()
             snake.length += 1
             snake.score += 1
         
@@ -251,6 +256,7 @@ def main():
 
     # when loop is over (i.e. no longer playing), create gameover screen
     # create black screen
+    death.play()
     cover = pygame.Surface(window.get_size())
     cover = cover.convert()
     cover.fill((0, 0, 0))
