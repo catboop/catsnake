@@ -22,5 +22,9 @@ Python 3.8.5
 
 Be sure to use this version to avoid compatibility issues.
 
+### Future Features
+- Start screen
+- Save high score
+
 
 
