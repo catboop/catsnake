@@ -1,3 +1,6 @@
+This was created during my time as a student at Code Chrysalis.
+
+
 ## CatSnake
 
 This is my own version of the classic Snake game. This was made using Python's Pygame module. 
